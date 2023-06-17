@@ -14,6 +14,9 @@ export const useSelectStyles = createUseStyles({
   },
   "select--active": {},
   select__label: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: "6px 10px",
   },
   select__dropdown: {
@@ -36,6 +39,9 @@ export const useSelectStyles = createUseStyles({
   select__dropdown__item: {
     borderRadius: "4px",
     padding: "2px 4px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
     "&:hover": {
       backgroundColor: "rgba(0, 46, 255, 0.24)",
       color: "blue",

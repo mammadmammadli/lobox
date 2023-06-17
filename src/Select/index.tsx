@@ -1,5 +1,7 @@
 import { KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useSelectStyles } from "./styles";
+import { FiChevronDown, FiChevronUp } from "react-icons/fi";
+import { BsCheckLg } from "react-icons/bs";
 
 type SelectProps = {
   options: Option[];
@@ -11,6 +13,7 @@ const Select = ({ options }: SelectProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(0);
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
   useEffect(() => {
     if (selectedIndex === 0) {
@@ -27,7 +30,6 @@ const Select = ({ options }: SelectProps) => {
   }, [selectedIndex, options]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    const isDropdownVisible = dropdownRef.current?.style.display === "block";
     const selectedOption = dropdownRef.current?.querySelector(
       `.${styles["select__dropdown__item--selected"]}`
     );
@@ -58,6 +60,7 @@ const Select = ({ options }: SelectProps) => {
       } else if (!isDropdownVisible) {
         if (dropdownRef.current) {
           dropdownRef.current.style.display = "block";
+          setIsDropdownVisible(true);
         }
       }
     } else if (e.key === "ArrowUp") {
@@ -87,6 +90,7 @@ const Select = ({ options }: SelectProps) => {
       } else {
         if (dropdownRef.current) {
           dropdownRef.current.style.display = "block";
+          setIsDropdownVisible(true);
         }
       }
     } else if (e.key === "Enter" && selectedIndex !== -1) {
@@ -94,6 +98,7 @@ const Select = ({ options }: SelectProps) => {
 
       if (dropdownRef.current) {
         dropdownRef.current.style.display = "none";
+        setIsDropdownVisible(false);
       }
     }
   };
@@ -101,13 +106,16 @@ const Select = ({ options }: SelectProps) => {
   const handleItemClick = (index: number) => {
     setSelectedIndex(index);
     setSelectedOption(index);
+    setIsDropdownVisible(true);
   };
 
   const handleClick = () => {
     if (dropdownRef.current) {
-      if (dropdownRef.current.style.display === "block") {
+      if (isDropdownVisible) {
+        setIsDropdownVisible(false);
         dropdownRef.current.style.display = "none";
       } else {
+        setIsDropdownVisible(true);
         dropdownRef.current.style.display = "block";
       }
     }
@@ -115,6 +123,7 @@ const Select = ({ options }: SelectProps) => {
 
   const handleBlur = () => {
     if (dropdownRef.current) {
+      setIsDropdownVisible(false);
       dropdownRef.current.style.display = "none";
     }
   };
@@ -130,9 +139,15 @@ const Select = ({ options }: SelectProps) => {
       onClick={handleClick}
       onBlur={handleBlur}
     >
-      <div className={styles.select__label}>{selectedOptionLabel}</div>
+      <div className={styles.select__label}>
+        {selectedOptionLabel}
+        {isDropdownVisible ? <FiChevronUp /> : <FiChevronDown />}
+      </div>
       <div ref={dropdownRef} className={styles.select__dropdown}>
         {options.map((option, index) => {
+          const isHighlighted = selectedIndex === index;
+          const isSelected = selectedOption === index;
+
           return (
             <div
               onClick={() => {
@@ -140,12 +155,11 @@ const Select = ({ options }: SelectProps) => {
               }}
               key={option.value}
               className={`${styles.select__dropdown__item} ${
-                selectedIndex === index
-                  ? styles["select__dropdown__item--selected"]
-                  : ""
+                isHighlighted ? styles["select__dropdown__item--selected"] : ""
               }`}
             >
               {option.label}
+              {isSelected && <BsCheckLg />}
             </div>
           );
         })}
